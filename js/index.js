@@ -88,7 +88,7 @@ function mostrarArticulos(datosLeidos){
 //--------------------------------------------------------------------------------------------------
 //Función que elimina los artículos del <aside id="columna">.
 function borrarArticulos(){
-
+  let contenedores=document.querySelector("#columna").chi
 }
 
 //--------------------------------------------------------------------------------------------------

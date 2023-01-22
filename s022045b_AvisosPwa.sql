@@ -113,8 +113,8 @@ CREATE TABLE `Familia` (
 --
 
 INSERT INTO `Familia` (`id`, `Descripcion`) VALUES
-(1, 'Telefonía'),
-(2, 'Informática'),
+(1, 'Telefonia'),
+(2, 'Informatica'),
 (6, 'Ropa'),
 (8, 'Accesorios');
 

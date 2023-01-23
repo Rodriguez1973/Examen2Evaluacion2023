@@ -4,9 +4,10 @@ let estrellaN = '☆'
 
 //--------------------------------------------------------------------------------------------------
 //Referencias de la interfaz.
-familiasArticulos = document.getElementById('familiasArticulos') //Select familiasArticulos.
-asideColumna= document.getElementById('columna') //Aside 'columna'
-cajaPedidos=document.getElementById('cajaPedidos') //Contenedor 'cajaPedidos'.
+const familiasArticulos = document.getElementById('familiasArticulos') //Select familiasArticulos.
+const asideColumna= document.getElementById('columna') //Aside 'columna'
+const cajaPedidos=document.getElementById('cajaPedidos') //Contenedor 'cajaPedidos'.
+const estrellas=document.getElementById('estrellas') //Contenedor 'estrellas'.
 
 //--------------------------------------------------------------------------------------------------
 //Eventos.
@@ -25,11 +26,12 @@ function leerFamilias() {
     .then((resp) => resp.json())
     // El objeto resp(response) es el objeto que recibe los datos devueltos por el servidor.
     .then((json) => {
-      console.log(json)
+      //console.log(json)
       añadirOpcionesFamilia(json)
     })
     .catch((err) => {
-      console.log('ERROR:' + err)
+      //console.log('ERROR:' + err)
+      mostrarVentanaEmergente('Error: '+err,'error')
     })
 }
 
@@ -59,11 +61,12 @@ function leerArticulosFamilia(evt) {
       return resp.json()
     })
     .then((json) => {
-      console.log(json)
+      //console.log(json)
       mostrarArticulos(json)
     })
     .catch((err) => {
-      console.log('ERROR :' + err)
+      //console.log('ERROR: ' + err)
+      mostrarVentanaEmergente('Error: '+err,'error')
     })
 }
 
@@ -80,8 +83,7 @@ function mostrarArticulos(datosLeidos){
     let imagen=contenedor.querySelector("img")
     imagen.src="https://www.informaticasc.com/daw_2122/AvisosMantenimiento/Articulos/Imagenes/"+datosLeidos[i].UrlImagen
     imagen.addEventListener("click", seleccionarArticulo, false) //Añade el evento click a la imagen.
-    imagen.setAttribute('nombrearticulo',datosLeidos[i].Nombre)
-    imagen.setAttribute('precioVenta',datosLeidos[i].PrecioVenta)
+    imagen.setAttribute('articulo',JSON.stringify(datosLeidos[i])) //Convierte un JSON a String para pasarlo como atributo.
     let precio=contenedor.querySelector("b")
     precio.innerText=datosLeidos[i].PrecioVenta
     asideColumna.appendChild(contenedor)  //Añade el contenedor.
@@ -102,33 +104,37 @@ function borrarArticulos(){
 //--------------------------------------------------------------------------------------------------
 //Función que responde al evento click sobre la imagen del artículo.
 function seleccionarArticulo(evt){
-  let articulo=document.createElement('div') //Crea un contenedor para cada artículo.
+  let articulo=JSON.parse(evt.target.getAttribute('articulo')) //Objeto articulo.
+  mostrarCalificacion(articulo) //Muestra la calificación del artículo seleccionado.
+  let contenedorArticulo=document.createElement('div') //Crea un contenedor para cada artículo.
   //Botón añadir datos.
   let boton=document.createElement('button');
   boton.type='button'
   boton.innerText='V'
-  articulo.appendChild(boton)
+  boton.addEventListener('click', (evt)=>{actualizarArticulo(evt, articulo)},false)
+  contenedorArticulo.appendChild(boton)
   //Botón borrar.
   boton=document.createElement('button');
   boton.type='button'
   boton.innerText='X'
   boton.addEventListener('click', borrarArticuloSeleccionado,false)
-  articulo.appendChild(boton)
+  contenedorArticulo.appendChild(boton)
   //Input cantidad.
   let inputNumber=document.createElement('input');
   inputNumber.type='number'
-  inputNumber.setAttribute('min',0)
-  inputNumber.value=0
-  articulo.appendChild(inputNumber)
+  inputNumber.setAttribute('min',1)
+  inputNumber.value=1
+  contenedorArticulo.appendChild(inputNumber)
   //Articulo.
   let nombreArticulo=document.createElement('p')
-  nombreArticulo.innerText=evt.target.getAttribute('nombrearticulo')
-  articulo.appendChild(nombreArticulo)
+  //console.log(evt.target.getAttribute('articulo')) Depu
+  nombreArticulo.innerText=articulo.Nombre
+  contenedorArticulo.appendChild(nombreArticulo)
   //Etiqueta calificación.
   let etiqueta=document.createElement('label');
   etiqueta.for='calificacion'
   etiqueta.innerText=estrellaS
-  articulo.appendChild(etiqueta)
+  contenedorArticulo.appendChild(etiqueta)
   //Input calificación.
   let inputRange=document.createElement('input');
   inputRange.id='calificacion'
@@ -138,8 +144,49 @@ function seleccionarArticulo(evt){
   inputRange.min='1'
   inputRange.max='5'
   inputRange.setAttribute('list','tickmarks')
-  articulo.appendChild(inputRange)
-  cajaPedidos.appendChild(articulo) //Se añade a cajaPedidos.
+  contenedorArticulo.appendChild(inputRange)
+  cajaPedidos.appendChild(contenedorArticulo) //Se añade a cajaPedidos.
+}
+
+//--------------------------------------------------------------------------------------------------
+//Función que visuliza laborra el div de los articulos seleccionados.
+function mostrarCalificacion(articulo){
+  let numeroEstrellasColor = articulo.SumaEstrellas / articulo.NumeroVentas
+  let cadenaEstrellas=""
+  for (let i = 0; i < parseInt(numeroEstrellasColor) && i<5; i++) {
+    cadenaEstrellas+=estrellaS;
+  }
+  for (let i = 0; i < 5-parseInt(numeroEstrellasColor); i++) {
+    cadenaEstrellas+=estrellaN;
+  }
+  estrellas.innerText=cadenaEstrellas;
+}
+
+
+//--------------------------------------------------------------------------------------------------
+//Función que actualiza el articulo.
+function actualizarArticulo(evt, articulo){
+  //grabarArticuloLocalStorage(articulo) //Graba el articulo el localStorage
+  //Actualizar base de datos.
+  let formData = new FormData()
+  formData.append('idArticulo', articulo.id)
+  formData.append('cantidad', evt.target.parentNode.childNodes[2].value) //Cantidad del articulo.
+  console.log(evt.target.parentNode.childNodes[4].value)
+  formData.append('estrellas', evt.target.parentNode.childNodes[4].value) //Cantidad de estrellas
+  fetch('https://www.informaticasc.com/daw_2122/AvisosMantenimiento/Articulos/php/actualizarLineaPedido.php', {
+    method: 'POST',
+    body: formData,
+  })
+    .then((resp) => {
+      return resp.json()
+    })
+    .then((json) => {
+      console.log(json)
+    })
+    .catch((err) => {
+      //console.log('ERROR: ' + err)
+      mostrarVentanaEmergente('Error: '+err,'error')
+    })
 }
 
 //--------------------------------------------------------------------------------------------------

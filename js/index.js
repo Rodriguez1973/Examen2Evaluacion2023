@@ -5,7 +5,8 @@ let estrellaN = '☆'
 //--------------------------------------------------------------------------------------------------
 //Referencias de la interfaz.
 familiasArticulos = document.getElementById('familiasArticulos') //Select familiasArticulos.
-asideColumna= document.getElementById('columna') //Aside
+asideColumna= document.getElementById('columna') //Aside 'columna'
+cajaPedidos=document.getElementById('cajaPedidos') //Contenedor 'cajaPedidos'.
 
 //--------------------------------------------------------------------------------------------------
 //Eventos.
@@ -88,13 +89,40 @@ function mostrarArticulos(datosLeidos){
 //--------------------------------------------------------------------------------------------------
 //Función que elimina los artículos del <aside id="columna">.
 function borrarArticulos(){
-  let contenedores=document.querySelector("#columna").chi
+  let aside=document.querySelector("#columna")
+  let contenedores=aside.querySelectorAll("div")
+  //Elimina todos los div dentro del aside menos el primero.
+  for (let i = 1; i < contenedores.length; i++) {
+    aside.removeChild(contenedores[i]);
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
 //Función que responde al evento click sobre la imagen del artículo.
 function seleccionarArticulo(evt){
-  
+  let articulo=document.createElement('div') //Crea un contenedor para cada artículo.
+  //Botón borrar.
+  let boton=document.createElement('button');
+  boton.type='button'
+  boton.innerText='X'
+  articulo.appendChild(boton)
+  //Botón añadir datos.
+  boton=document.createElement('button');
+  boton.type='button'
+  boton.innerText='V'
+  articulo.appendChild(boton)
+  //Input cantidad.
+  let inputNumber=document.createElement('input');
+  inputNumber.type='number'
+  inputNumber.setAttribute('min',0)
+  inputNumber.value=0
+  articulo.appendChild(inputNumber)
+  //Etiqueta calificación.
+  let etiqueta=document.createElement('label');
+  etiqueta.for='calificacion'
+  etiqueta.innerText=estrellaS
+  articulo.appendChild(etiqueta) 
+  cajaPedidos.appendChild(articulo) //Se añade a cajaPedidos.
 }
 
 //--------------------------------------------------------------------------------------------------

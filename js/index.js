@@ -80,6 +80,8 @@ function mostrarArticulos(datosLeidos){
     let imagen=contenedor.querySelector("img")
     imagen.src="https://www.informaticasc.com/daw_2122/AvisosMantenimiento/Articulos/Imagenes/"+datosLeidos[i].UrlImagen
     imagen.addEventListener("click", seleccionarArticulo, false) //Añade el evento click a la imagen.
+    imagen.setAttribute('nombrearticulo',datosLeidos[i].Nombre)
+    imagen.setAttribute('precioVenta',datosLeidos[i].PrecioVenta)
     let precio=contenedor.querySelector("b")
     precio.innerText=datosLeidos[i].PrecioVenta
     asideColumna.appendChild(contenedor)  //Añade el contenedor.
@@ -101,15 +103,16 @@ function borrarArticulos(){
 //Función que responde al evento click sobre la imagen del artículo.
 function seleccionarArticulo(evt){
   let articulo=document.createElement('div') //Crea un contenedor para cada artículo.
-  //Botón borrar.
+  //Botón añadir datos.
   let boton=document.createElement('button');
   boton.type='button'
-  boton.innerText='X'
+  boton.innerText='V'
   articulo.appendChild(boton)
-  //Botón añadir datos.
+  //Botón borrar.
   boton=document.createElement('button');
   boton.type='button'
-  boton.innerText='V'
+  boton.innerText='X'
+  boton.addEventListener('click', borrarArticuloSeleccionado,false)
   articulo.appendChild(boton)
   //Input cantidad.
   let inputNumber=document.createElement('input');
@@ -117,14 +120,44 @@ function seleccionarArticulo(evt){
   inputNumber.setAttribute('min',0)
   inputNumber.value=0
   articulo.appendChild(inputNumber)
+  //Articulo.
+  let nombreArticulo=document.createElement('p')
+  nombreArticulo.innerText=evt.target.getAttribute('nombrearticulo')
+  articulo.appendChild(nombreArticulo)
   //Etiqueta calificación.
   let etiqueta=document.createElement('label');
   etiqueta.for='calificacion'
   etiqueta.innerText=estrellaS
-  articulo.appendChild(etiqueta) 
+  articulo.appendChild(etiqueta)
+  //Input calificación.
+  let inputRange=document.createElement('input');
+  inputRange.id='calificacion'
+  inputRange.type='range'
+  inputRange.step="1"
+  inputRange.value="0"
+  inputRange.min='1'
+  inputRange.max='5'
+  inputRange.setAttribute('list','tickmarks')
+  articulo.appendChild(inputRange)
   cajaPedidos.appendChild(articulo) //Se añade a cajaPedidos.
 }
 
 //--------------------------------------------------------------------------------------------------
-//Ejecución.
+//Función que borra el div de los articulos seleccionados.
+function borrarArticuloSeleccionado(evt){
+  cajaPedidos.removeChild(evt.target.parentNode) //Se borra el nodo padre (div que contiene el artículo).
+}
+
+//--------------------------------------------------------------------------------------------------
+//Muestra ventana emergente informando que no existen mas registros.
+function mostrarVentanaEmergente(mensaje, icono) {
+  Swal.fire({
+    icon: icono,
+    text: mensaje,
+    confirmButtonText: 'Aceptar',
+  })
+}
+
+
+//Inicio de ejecución.
 leerFamilias()

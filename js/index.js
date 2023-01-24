@@ -96,7 +96,7 @@ function mostrarArticulos(datosLeidos){
 function borrarArticulos(){
   let aside=document.querySelector("#columna")
   let contenedores=aside.querySelectorAll("div")
-  //Elimina todos los div dentro del aside menos el primero.
+  //Elimina todos los div dentro del aside menos el primero (i=0).
   for (let i = 1; i < contenedores.length; i++) {
     aside.removeChild(contenedores[i]);
   }

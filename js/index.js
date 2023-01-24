@@ -8,6 +8,7 @@ const familiasArticulos = document.getElementById('familiasArticulos') //Select 
 const asideColumna= document.getElementById('columna') //Aside 'columna'
 const cajaPedidos=document.getElementById('cajaPedidos') //Contenedor 'cajaPedidos'.
 const estrellas=document.getElementById('estrellas') //Contenedor 'estrellas'.
+const cajaComprasAnteriores=document.getElementById('cajaComprasAnteriores') //Contenedor 'cajaComprasAnteriores'
 
 //--------------------------------------------------------------------------------------------------
 //Eventos.
@@ -31,7 +32,7 @@ function leerFamilias() {
     })
     .catch((err) => {
       //console.log('ERROR:' + err)
-      mostrarVentanaEmergente('Error: '+err,'error')
+      mostrarVentanaEmergente('BASE DE DATOS','Error: '+err,'error')
     })
 }
 
@@ -66,7 +67,7 @@ function leerArticulosFamilia(evt) {
     })
     .catch((err) => {
       //console.log('ERROR: ' + err)
-      mostrarVentanaEmergente('Error: '+err,'error')
+      mostrarVentanaEmergente('BASE DE DATOS','Error: '+err,'error')
     })
 }
 
@@ -166,27 +167,29 @@ function mostrarCalificacion(articulo){
 //--------------------------------------------------------------------------------------------------
 //Función que actualiza el articulo.
 function actualizarArticulo(evt, articulo){
-  //grabarArticuloLocalStorage(articulo) //Graba el articulo el localStorage
   //Actualizar base de datos.
   let formData = new FormData()
   formData.append('idArticulo', articulo.id)
+  //console.log(evt.target.parentNode.childNodes[2].value) //Depuración.
+  //console.log(evt.target.parentNode.childNodes[5].value) //Depuración.
   formData.append('cantidad', evt.target.parentNode.childNodes[2].value) //Cantidad del articulo.
-  console.log(evt.target.parentNode.childNodes[4].value)
-  formData.append('estrellas', evt.target.parentNode.childNodes[4].value) //Cantidad de estrellas
+  formData.append('estrellas', evt.target.parentNode.childNodes[5].value) //Cantidad de estrellas
   fetch('https://www.informaticasc.com/daw_2122/AvisosMantenimiento/Articulos/php/actualizarLineaPedido.php', {
     method: 'POST',
     body: formData,
   })
     .then((resp) => {
-      return resp.json()
-    })
-    .then((json) => {
-      console.log(json)
+      return resp.text()
+    }).then((mensaje)=>{
+      //Adaptación del mensaje
+      mostrarVentanaEmergente('BASE DE DATOS', mensaje, 'success')
+      guardarArticuloLocalStorage(articulo) //Graba el articulo el localStorage
     })
     .catch((err) => {
       //console.log('ERROR: ' + err)
-      mostrarVentanaEmergente('Error: '+err,'error')
+      mostrarVentanaEmergente('BASE DE DATOS','Error: '+err,'error')
     })
+    borrarArticuloSeleccionado(evt)
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -196,15 +199,17 @@ function borrarArticuloSeleccionado(evt){
 }
 
 //--------------------------------------------------------------------------------------------------
-//Muestra ventana emergente informando que no existen mas registros.
-function mostrarVentanaEmergente(mensaje, icono) {
+//Función que muestra ventana emergente de notificaciones.
+function mostrarVentanaEmergente(titulo, mensaje, icono) {
   Swal.fire({
-    icon: icono,
+    title: titulo,
     text: mensaje,
+    icon: icono,
     confirmButtonText: 'Aceptar',
   })
 }
 
-
+//--------------------------------------------------------------------------------------------------
 //Inicio de ejecución.
 leerFamilias()
+leerRegistrosLocalStorage()

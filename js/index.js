@@ -21,7 +21,7 @@ borrarLocalStorage.addEventListener('click', borrarRegistrosLocalStorage, false)
 //Función que realiza la lectura de las familias de la base de datos.
 function leerFamilias() {
   fetch(
-    'http://www.informaticasc.com/daw_2122/AvisosMantenimiento/Articulos/php/consultaFamilia.php',
+    'https://www.informaticasc.com/daw_2122/AvisosMantenimiento/Articulos/php/consultaFamilia.php',
     {
       method: 'POST',
     },

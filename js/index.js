@@ -5,15 +5,17 @@ let estrellaN = '☆'
 //--------------------------------------------------------------------------------------------------
 //Referencias de la interfaz.
 const familiasArticulos = document.getElementById('familiasArticulos') //Select familiasArticulos.
-const asideColumna= document.getElementById('columna') //Aside 'columna'
-const cajaPedidos=document.getElementById('cajaPedidos') //Contenedor 'cajaPedidos'.
-const estrellas=document.getElementById('estrellas') //Contenedor 'estrellas'.
-const cajaComprasAnteriores=document.getElementById('cajaComprasAnteriores') //Contenedor 'cajaComprasAnteriores'
+const asideColumna = document.getElementById('columna') //Aside 'columna'
+const cajaPedidos = document.getElementById('cajaPedidos') //Contenedor 'cajaPedidos'.
+const estrellas = document.getElementById('estrellas') //Contenedor 'estrellas'.
+const cajaComprasAnteriores = document.getElementById('cajaComprasAnteriores') //Contenedor 'cajaComprasAnteriores'
+const borrarLocalStorage = document.getElementById('borrarLocalStorage') //Botón Borrar historial compras.
 
 //--------------------------------------------------------------------------------------------------
 //Eventos.
 //Cambio de la option en la select familiasArticulos.
 familiasArticulos.addEventListener('change', leerArticulosFamilia, false)
+borrarLocalStorage.addEventListener('click', borrarRegistrosLocalStorage, false)
 
 //--------------------------------------------------------------------------------------------------
 //Función que realiza la lectura de las familias de la base de datos.
@@ -32,7 +34,7 @@ function leerFamilias() {
     })
     .catch((err) => {
       //console.log('ERROR:' + err)
-      mostrarVentanaEmergente('BASE DE DATOS','Error: '+err,'error')
+      mostrarVentanaEmergente('BASE DE DATOS', 'Error: ' + err, 'error')
     })
 }
 
@@ -67,35 +69,35 @@ function leerArticulosFamilia(evt) {
     })
     .catch((err) => {
       //console.log('ERROR: ' + err)
-      mostrarVentanaEmergente('BASE DE DATOS','Error: '+err,'error')
+      mostrarVentanaEmergente('BASE DE DATOS', 'Error: ' + err, 'error')
     })
 }
 
 //--------------------------------------------------------------------------------------------------
 //Función que muestra los articulos en la interfaz.
-function mostrarArticulos(datosLeidos){
+function mostrarArticulos(datosLeidos) {
   borrarArticulos() //Borra los artículos.
   let primerDivAside = document.querySelector("#columna").childNodes[1];
   for (i = 0; i < datosLeidos.length; i++) {
-    let contenedor= primerDivAside.cloneNode(true); //Clona el primer div del aside "columna".
-	  //Obtiene el elemento img clonado e  cajon2
+    let contenedor = primerDivAside.cloneNode(true); //Clona el primer div del aside "columna".
+    //Obtiene el elemento img clonado e  cajon2
     let parrafo = contenedor.querySelector("p")
-    parrafo.innerText=datosLeidos[i].Nombre
-    let imagen=contenedor.querySelector("img")
-    imagen.src="https://www.informaticasc.com/daw_2122/AvisosMantenimiento/Articulos/Imagenes/"+datosLeidos[i].UrlImagen
+    parrafo.innerText = datosLeidos[i].Nombre
+    let imagen = contenedor.querySelector("img")
+    imagen.src = "https://www.informaticasc.com/daw_2122/AvisosMantenimiento/Articulos/Imagenes/" + datosLeidos[i].UrlImagen
     imagen.addEventListener("click", seleccionarArticulo, false) //Añade el evento click a la imagen.
-    imagen.setAttribute('articulo',JSON.stringify(datosLeidos[i])) //Convierte un JSON a String para pasarlo como atributo.
-    let precio=contenedor.querySelector("b")
-    precio.innerText=datosLeidos[i].PrecioVenta
+    imagen.setAttribute('articulo', JSON.stringify(datosLeidos[i])) //Convierte un JSON a String para pasarlo como atributo.
+    let precio = contenedor.querySelector("b")
+    precio.innerText = datosLeidos[i].PrecioVenta
     asideColumna.appendChild(contenedor)  //Añade el contenedor.
   }
 }
 
 //--------------------------------------------------------------------------------------------------
 //Función que elimina los artículos del <aside id="columna">.
-function borrarArticulos(){
-  let aside=document.querySelector("#columna")
-  let contenedores=aside.querySelectorAll("div")
+function borrarArticulos() {
+  let aside = document.querySelector("#columna")
+  let contenedores = aside.querySelectorAll("div")
   //Elimina todos los div dentro del aside menos el primero (i=0).
   for (let i = 1; i < contenedores.length; i++) {
     aside.removeChild(contenedores[i]);
@@ -104,97 +106,102 @@ function borrarArticulos(){
 
 //--------------------------------------------------------------------------------------------------
 //Función que responde al evento click sobre la imagen del artículo.
-function seleccionarArticulo(evt){
-  let articulo=JSON.parse(evt.target.getAttribute('articulo')) //Objeto articulo.
+function seleccionarArticulo(evt) {
+  let articulo = JSON.parse(evt.target.getAttribute('articulo')) //Objeto articulo.
   mostrarCalificacion(articulo) //Muestra la calificación del artículo seleccionado.
-  let contenedorArticulo=document.createElement('div') //Crea un contenedor para cada artículo.
+  let contenedorArticulo = document.createElement('div') //Crea un contenedor para cada artículo.
   //Botón añadir datos.
-  let boton=document.createElement('button');
-  boton.type='button'
-  boton.innerText='V'
-  boton.addEventListener('click', (evt)=>{actualizarArticulo(evt, articulo)},false)
+  let boton = document.createElement('button');
+  boton.type = 'button'
+  boton.innerText = 'V'
+  boton.addEventListener('click', (evt) => { actualizarArticulo(evt, articulo) }, false)
   contenedorArticulo.appendChild(boton)
   //Botón borrar.
-  boton=document.createElement('button');
-  boton.type='button'
-  boton.innerText='X'
-  boton.addEventListener('click', borrarArticuloSeleccionado,false)
+  boton = document.createElement('button');
+  boton.type = 'button'
+  boton.innerText = 'X'
+  boton.addEventListener('click', borrarArticuloSeleccionado, false)
   contenedorArticulo.appendChild(boton)
   //Input cantidad.
-  let inputNumber=document.createElement('input');
-  inputNumber.type='number'
-  inputNumber.setAttribute('min',1)
-  inputNumber.value=1
+  let inputNumber = document.createElement('input');
+  inputNumber.type = 'number'
+  inputNumber.setAttribute('min', 1)
+  inputNumber.setAttribute('required', true)
+  inputNumber.value = 1
   contenedorArticulo.appendChild(inputNumber)
   //Articulo.
-  let nombreArticulo=document.createElement('p')
-  //console.log(evt.target.getAttribute('articulo')) Depu
-  nombreArticulo.innerText=articulo.Nombre
+  let nombreArticulo = document.createElement('p')
+  nombreArticulo.innerText = articulo.Nombre
   contenedorArticulo.appendChild(nombreArticulo)
   //Etiqueta calificación.
-  let etiqueta=document.createElement('label');
-  etiqueta.for='calificacion'
-  etiqueta.innerText=estrellaS
+  let etiqueta = document.createElement('label');
+  etiqueta.for = 'calificacion'
+  etiqueta.innerText = estrellaS
   contenedorArticulo.appendChild(etiqueta)
   //Input calificación.
-  let inputRange=document.createElement('input');
-  inputRange.id='calificacion'
-  inputRange.type='range'
-  inputRange.step="1"
-  inputRange.value="0"
-  inputRange.min='1'
-  inputRange.max='5'
-  inputRange.setAttribute('list','tickmarks')
+  let inputRange = document.createElement('input');
+  inputRange.id = 'calificacion'
+  inputRange.type = 'range'
+  inputRange.step = "1"
+  inputRange.value = "0"
+  inputRange.min = '1'
+  inputRange.max = '5'
+  inputRange.setAttribute('list', 'tickmarks')
   contenedorArticulo.appendChild(inputRange)
   cajaPedidos.appendChild(contenedorArticulo) //Se añade a cajaPedidos.
 }
 
 //--------------------------------------------------------------------------------------------------
 //Función que visuliza laborra el div de los articulos seleccionados.
-function mostrarCalificacion(articulo){
+function mostrarCalificacion(articulo) {
   let numeroEstrellasColor = articulo.SumaEstrellas / articulo.NumeroVentas
-  let cadenaEstrellas=""
-  for (let i = 0; i < parseInt(numeroEstrellasColor) && i<5; i++) {
-    cadenaEstrellas+=estrellaS;
+  let cadenaEstrellas = ""
+  for (let i = 0; i < parseInt(numeroEstrellasColor) && i < 5; i++) {
+    cadenaEstrellas += estrellaS;
   }
-  for (let i = 0; i < 5-parseInt(numeroEstrellasColor); i++) {
-    cadenaEstrellas+=estrellaN;
+  for (let i = 0; i < 5 - parseInt(numeroEstrellasColor); i++) {
+    cadenaEstrellas += estrellaN;
   }
-  estrellas.innerText=cadenaEstrellas;
+  estrellas.innerText = cadenaEstrellas;
 }
 
 
 //--------------------------------------------------------------------------------------------------
 //Función que actualiza el articulo.
-function actualizarArticulo(evt, articulo){
-  //Actualizar base de datos.
-  let formData = new FormData()
-  formData.append('idArticulo', articulo.id)
-  //console.log(evt.target.parentNode.childNodes[2].value) //Depuración.
-  //console.log(evt.target.parentNode.childNodes[5].value) //Depuración.
-  formData.append('cantidad', evt.target.parentNode.childNodes[2].value) //Cantidad del articulo.
-  formData.append('estrellas', evt.target.parentNode.childNodes[5].value) //Cantidad de estrellas
-  fetch('https://www.informaticasc.com/daw_2122/AvisosMantenimiento/Articulos/php/actualizarLineaPedido.php', {
-    method: 'POST',
-    body: formData,
-  })
-    .then((resp) => {
-      return resp.text()
-    }).then((mensaje)=>{
-      //Adaptación del mensaje
-      mostrarVentanaEmergente('BASE DE DATOS', mensaje, 'success')
-      guardarArticuloLocalStorage(articulo) //Graba el articulo el localStorage
+function actualizarArticulo(evt, articulo) {
+  //Existe cantidad.
+  if (evt.target.parentNode.childNodes[2].value != '') {
+    //Actualizar base de datos.
+    let formData = new FormData()
+    formData.append('idArticulo', articulo.id)
+    //console.log(evt.target.parentNode.childNodes[2].value) //Depuración.
+    //console.log(evt.target.parentNode.childNodes[5].value) //Depuración.
+    formData.append('cantidad', evt.target.parentNode.childNodes[2].value) //Cantidad del articulo.
+    formData.append('estrellas', evt.target.parentNode.childNodes[5].value) //Cantidad de estrellas
+    fetch('https://www.informaticasc.com/daw_2122/AvisosMantenimiento/Articulos/php/actualizarLineaPedido.php', {
+      method: 'POST',
+      body: formData,
     })
-    .catch((err) => {
-      //console.log('ERROR: ' + err)
-      mostrarVentanaEmergente('BASE DE DATOS','Error: '+err,'error')
-    })
+      .then((resp) => {
+        return resp.text()
+      }).then((mensaje) => {
+        //Adaptación del mensaje
+        mostrarVentanaEmergente('BASE DE DATOS', mensaje, 'success')
+        guardarArticuloLocalStorage(articulo) //Graba el articulo el localStorage
+      })
+      .catch((err) => {
+        //console.log('ERROR: ' + err)
+        mostrarVentanaEmergente('BASE DE DATOS', 'Error: ' + err, 'error')
+      })
     borrarArticuloSeleccionado(evt)
+  } else {
+    mostrarVentanaEmergente('Error', "La cantidad introducida no es válida.", 'error')
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
 //Función que borra el div de los articulos seleccionados.
-function borrarArticuloSeleccionado(evt){
+function borrarArticuloSeleccionado(evt) {
   cajaPedidos.removeChild(evt.target.parentNode) //Se borra el nodo padre (div que contiene el artículo).
 }
 

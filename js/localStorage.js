@@ -54,3 +54,19 @@ function obtenerUltimaClave() {
   }
   return uClave
 }
+
+//--------------------------------------------------------------------------------------------------
+//Borrar todo el contenido del localStorage.
+function borrarRegistrosLocalStorage() {
+  if (window.localStorage.length > 0) {
+    window.localStorage.clear()
+    ultimaClave = 0
+    cajaComprasAnteriores.innerHTML = ''
+  } else {
+    mostrarVentanaEmergente(
+      'Almacenamiento',
+      'No existen registros que borrar en el almacenamiento local.',
+      'info',
+    )
+  }
+}

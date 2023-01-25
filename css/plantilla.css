@@ -338,3 +338,7 @@ aside div p {
 #cajaPedidos div input:first-of-type{
   width: 50px;
 }
+
+#borrarLocalStorage{
+  float: right;
+}
